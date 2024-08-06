@@ -6,7 +6,7 @@ import { TransactionDTO } from './transaction.dto';
 export class TransactionService {
   constructor(private readonly prismaService: PrismaService) {}
 
-  async create(data: TransactionDTO) {
+  async add(data: TransactionDTO) {
     return await this.prismaService.transactions.create({
       data,
     });
