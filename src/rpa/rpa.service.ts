@@ -9,11 +9,12 @@ export class RpaService {
 
   constructor() {}
 
-  async extract() {
+  async extractFile() {
     await this.createPage();
     await this.login();
-    await this.downloadFile();
+    const path = await this.downloadFile();
     await this.browser.close();
+    return path;
   }
 
   private async createPage() {
@@ -70,6 +71,9 @@ export class RpaService {
     await this.page.getByText('Baixar').click();
     const download = await downloadPromise;
 
-    await download.saveAs('./downloads/' + download.suggestedFilename());
+    const path = `./downloads/${download.suggestedFilename()}`;
+    await download.saveAs(path);
+
+    return path;
   }
 }
