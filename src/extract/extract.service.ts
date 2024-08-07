@@ -1,15 +1,15 @@
 import { Injectable } from '@nestjs/common';
 import { RpaService } from '../rpa/rpa.service';
 import { TransactionDTO } from '../dto/transaction.dto';
-import { PrismaService } from '../../prisma/prisma.service';
 import * as xlsx from 'xlsx';
 import { plainToClass } from 'class-transformer';
+import { DataRepository } from '../data/data.repository';
 
 @Injectable()
 export class ExtractService {
   constructor(
     private readonly rpaService: RpaService,
-    private readonly prismaService: PrismaService,
+    private readonly dataRepository: DataRepository,
   ) {}
 
   async extractByPeriod(month: string, year: string) {
@@ -52,18 +52,12 @@ export class ExtractService {
       }
     }
 
-    await this.prismaService.transactions.deleteMany({
-      where: {
-        OR: filters,
-      },
-    });
+    await this.dataRepository.deleteMany(filters);
 
     const dataPeriod = data.filter(
       (x) => monthList.includes(x.month) && yearList.includes(x.year),
     );
 
-    return await this.prismaService.transactions.createMany({
-      data: dataPeriod,
-    });
+    return await this.dataRepository.addMany(dataPeriod);
   }
 }
